@@ -1,0 +1,166 @@
+name: causalops
+
+networks:
+  causalops-net:
+    driver: bridge
+
+volumes:
+  om-mysql-data:
+  om-es-data:
+  postgres-data:
+  timescale-data:
+
+services:
+  openmetadata-mysql:
+    image: openmetadata/db:1.5.13
+    container_name: openmetadata-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    expose:
+      - "3306"
+    volumes:
+      - om-mysql-data:/var/lib/mysql
+    networks:
+      - causalops-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  openmetadata-es:
+    image: opensearchproject/opensearch:2.11.1
+    container_name: openmetadata-es
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    expose:
+      - "9200"
+      - "9600"
+    volumes:
+      - om-es-data:/usr/share/opensearch/data
+    networks:
+      - causalops-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  openmetadata-server:
+    image: ghcr.io/open-metadata/openmetadata-server:1.5.13
+    container_name: openmetadata-server
+    restart: always
+    environment:
+      DB_DRIVER_CLASS: com.mysql.cj.jdbc.Driver
+      DB_SCHEME: mysql
+      DB_USE_SSL: "false"
+      DB_USER: openmetadata_user
+      DB_USER_PASSWORD: openmetadata_password
+      DB_HOST: openmetadata-mysql
+      DB_PORT: "3306"
+      OM_DATABASE: openmetadata_db
+      ELASTICSEARCH_HOST: openmetadata-es
+      ELASTICSEARCH_PORT: "9200"
+      ELASTICSEARCH_SCHEME: http
+      SEARCH_TYPE: opensearch
+      MIGRATION_LIMIT_PARAM: "1200"
+      PIPELINE_SERVICE_CLIENT_ENDPOINT: http://openmetadata-ingestion:8080
+      SERVER_HOST_API_URL: http://openmetadata-server:8585/api
+    ports:
+      - "8585:8585"
+      - "8586:8586"
+    depends_on:
+      openmetadata-mysql:
+        condition: service_healthy
+      openmetadata-es:
+        condition: service_healthy
+    networks:
+      - causalops-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8586/healthcheck || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 180s
+
+  openmetadata-ingestion:
+    image: openmetadata/ingestion:1.5.13
+    container_name: openmetadata-ingestion
+    restart: always
+    environment:
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_GENERATED_CONFIGS: /opt/airflow/dag_generated_configs
+      DB_HOST: openmetadata-mysql
+    expose:
+      - "8080"
+    depends_on:
+      openmetadata-mysql:
+        condition: service_healthy
+    networks:
+      - causalops-net
+
+  postgres:
+    image: postgres:16
+    container_name: causalops-postgres
+    environment:
+      POSTGRES_USER: causalops
+      POSTGRES_PASSWORD: causalops
+      POSTGRES_DB: causalops
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - causalops-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U causalops -d causalops"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: causalops-timescaledb
+    environment:
+      POSTGRES_USER: causalops
+      POSTGRES_PASSWORD: causalops
+      POSTGRES_DB: events
+    ports:
+      - "5433:5432"
+    volumes:
+      - timescale-data:/var/lib/postgresql/data
+    networks:
+      - causalops-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U causalops -d events"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  causal-worker:
+    build:
+      context: ./services/causal-worker
+    container_name: causalops-causal-worker
+    environment:
+      TIMESCALE_URL: postgres://causalops:causalops@timescaledb:5432/events
+      DATABASE_URL: postgres://causalops:causalops@postgres:5432/causalops
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+    networks:
+      - causalops-net
