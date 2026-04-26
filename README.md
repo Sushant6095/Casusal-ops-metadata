@@ -66,17 +66,9 @@ Every answer ships with **placebo p-values, subset stability, and 95% confidence
 
 ---
 
-### Why — counterfactual RCA *(coming soon — see [demo video](#-demo-video))*
-
-> Three-column layout: 14-day upstream events on the left, upstream-only DAG in the middle with the failed outcome ringed cyan, ranked candidate causes on the right. Click any cause to expand the EvidencePanel — effect size, P(factual), P(counterfactual), 95% CI, placebo p-value, subset stability, and the method used.
-
----
-
 ## 🎬 Demo video
 
-Watch the 3-minute walkthrough: **[YouTube](#)** *(replace with your link)*
-
-A click-by-click walkthrough is in the video.
+3-minute walkthrough: **[YouTube](#)** _(paste link after upload)_
 
 ---
 
@@ -105,20 +97,6 @@ pnpm backtest
 
 ![Architecture](docs/architecture.svg)
 
-```
-OpenMetadata ──▶ Ingestor ──▶ TimescaleDB ──▶ Causal worker (Python)
-                                  │                  │
-                                  ▼                  │
-                                  API ◀──────────────┘
-                                  │
-                            ┌─────┴─────┐
-                            ▼           ▼
-                          Web UI       MCP server
-                                          │
-                                          ▼
-                              OM chat / Claude Desktop
-```
-
 | Layer | Service | Tech |
 |---|---|---|
 | **Source of truth** | OpenMetadata | OM 1.5.13 — lineage, events, DQ, tags |
@@ -132,8 +110,6 @@ OpenMetadata ──▶ Ingestor ──▶ TimescaleDB ──▶ Causal worker (P
 ---
 
 ## 🔌 OpenMetadata integration
-
-Every interaction with OM is intentional and traceable.
 
 | Endpoint | Purpose | Code path |
 |---|---|---|
@@ -178,8 +154,6 @@ Open <http://localhost:3000>.
 
 > 🩺 **Health check:** `curl localhost:3001/health localhost:8000/health localhost:3000` — should all return 200.
 
-No-OM-token demo: skip step 4's `seed:om` and use `pnpm demo:seed` — populates TimescaleDB directly.
-
 ---
 
 ## 🎩 MCP integration
@@ -219,41 +193,6 @@ See [`apps/mcp/mcp.config.json`](apps/mcp/mcp.config.json) — paste into OM Set
 2. **Do-calculus is the right algebra.** `P(Y | do(X))` is a different quantity than `P(Y | X)`. CausalOps computes the former by **backdoor adjustment** over OM's lineage DAG.
 3. **Backdoor + propensity score matching.** We pick the minimal adjustment set (parents of the treatment, minus descendants), then match propensity scores between treated and untreated time-buckets. EconML's Double-ML kicks in when the adjustment set grows past 20 covariates.
 4. **Refutation is non-negotiable.** Placebo permutation p-value + subset stability ship on every estimate. *Confidence in the UI* is a weighted function of both, not a tone-of-voice decision.
-
-
----
-
-## 🛠️ Tech stack
-
-<details>
-<summary><b>TypeScript monorepo</b> (pnpm + turborepo)</summary>
-
-- **Web**: Next.js 15 · React 19 RC · Tailwind CSS · D3 force · Lucide · Framer Motion
-- **API**: Fastify 5 · tRPC 11 · Zod · Pino · Prom-client
-- **Ingest**: BullMQ · Drizzle ORM · postgres-js
-- **Shared**: `@causalops/om-client` (Axios + Zod) · `@causalops/ingestor` (drizzle schema)
-- **MCP**: @modelcontextprotocol/sdk · undici · superjson
-
-</details>
-
-<details>
-<summary><b>Python service</b> (only one in the repo)</summary>
-
-- **Web**: FastAPI · uvicorn · pydantic v2
-- **DB**: asyncpg
-- **Causal**: DoWhy · EconML · scikit-learn · causal-learn · NetworkX
-
-</details>
-
-<details>
-<summary><b>Data plane</b></summary>
-
-- **OpenMetadata** 1.5.13 (official Docker images: server, MySQL, OpenSearch, ingestion)
-- **TimescaleDB** (pg16) — 1-day hypertable chunks for `change_events` + `test_case_results`
-- **Postgres 16** for app state
-- **Redis 7** for BullMQ
-
-</details>
 
 ---
 
@@ -300,10 +239,10 @@ CausalOps-hackathon/
 
 ## 🙏 Acknowledgements
 
-- [**OpenMetadata**](https://open-metadata.org/) and **Collate** for the catalog and lineage substrate. *None of this works without the platform you've built.*
+- [**OpenMetadata**](https://open-metadata.org/) and **Collate** — the catalog and lineage substrate.
 - [**DoWhy**](https://www.pywhy.org/dowhy/) and [**EconML**](https://econml.azurewebsites.net/) for the causal-inference plumbing.
-- [**TimescaleDB**](https://www.timescale.com/) for making 30-day event windows cheap.
-- The **Model Context Protocol** community for making tools-for-LLMs boring.
+- [**TimescaleDB**](https://www.timescale.com/) — 30-day event windows at low cost.
+- **Model Context Protocol** — for the tool-calling spec.
 
 ---
 
@@ -311,6 +250,6 @@ CausalOps-hackathon/
 
 **Built for the OpenMetadata × Collate hackathon.**
 
-⭐ Star the repo if this is useful · [Open an issue](https://github.com/Sushant6095/Casusal-ops-metadata/issues) for questions
+⭐ Star the repo · [Open an issue](https://github.com/Sushant6095/Casusal-ops-metadata/issues)
 
 </div>
