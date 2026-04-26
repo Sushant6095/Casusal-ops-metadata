@@ -1,0 +1,11 @@
+node_modules
+dist
+.next
+.turbo
+.env
+.env.local
+**/__pycache__
+*.pyc
+.venv
+scripts/.incidents-ground-truth.json
+*.pytest_cache*

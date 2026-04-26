@@ -1,0 +1,40 @@
+{
+  "name": "causalops",
+  "description": "Causal-inference tools for OpenMetadata. Rank upstream causes of failures, simulate blast radius of proposed changes, fetch risk scores, list recent failures.",
+  "version": "0.1.0",
+  "transport": {
+    "type": "stdio",
+    "command": "pnpm",
+    "args": ["--filter", "@causalops/mcp", "start"]
+  },
+  "remoteTransport": {
+    "type": "sse",
+    "url": "http://localhost:3100/sse"
+  },
+  "env": {
+    "API_BASE_URL": {
+      "description": "Base URL of the CausalOps API (Fastify)",
+      "default": "http://localhost:3001",
+      "required": true
+    },
+    "API_TOKEN": {
+      "description": "Bearer token for the CausalOps API (optional in dev)",
+      "required": false
+    },
+    "MCP_TRANSPORT": {
+      "description": "'stdio' (default) or 'http' to enable SSE transport",
+      "required": false
+    },
+    "MCP_HTTP_PORT": {
+      "description": "Port for the SSE transport when MCP_TRANSPORT=http",
+      "default": "3100",
+      "required": false
+    }
+  },
+  "tools": [
+    "rank_causes",
+    "simulate_intervention",
+    "get_risk_score",
+    "list_failures"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3.12 -m venv .venv)",
+      "Bash(.venv/bin/pip install *)",
+      "Bash(PYTHONPATH=. .venv/bin/pytest -q)",
+      "Bash(.venv/bin/python -c ' *)",
+      "Bash(PYTHONPATH=. .venv/bin/python -m py_compile src/main.py src/db.py src/models.py src/data_loader.py src/scm_fit.py src/counterfactual.py src/intervention.py src/refutation.py)",
+      "Bash(pnpm --filter @causalops/api typecheck)",
+      "Bash(pnpm --filter @causalops/api build)",
+      "Bash(pnpm --filter @causalops/api test)",
+      "Bash(pnpm --filter @causalops/web typecheck)"
+    ],
+    "additionalDirectories": [
+      "/Users/vyapar/Downloads/CausalOps-hackathon/app/why"
+    ]
+  }
+}
