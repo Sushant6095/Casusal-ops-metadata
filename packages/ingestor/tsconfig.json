@@ -6,6 +6,7 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
     "outDir": "dist",
     "rootDir": "src",
     "types": ["node"],
