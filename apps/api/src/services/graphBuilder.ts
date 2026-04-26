@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, inArray, or } from "drizzle-orm";
 import {
   entities,
   lineageEdges,
@@ -77,10 +77,13 @@ export const getLineageSubgraph = async (
       .from(lineageEdges)
       .where(
         direction === "downstream"
-          ? sql`${lineageEdges.fromFqn} = ANY(${frontierArr})`
+          ? inArray(lineageEdges.fromFqn, frontierArr)
           : direction === "upstream"
-            ? sql`${lineageEdges.toFqn} = ANY(${frontierArr})`
-            : sql`${lineageEdges.fromFqn} = ANY(${frontierArr}) OR ${lineageEdges.toFqn} = ANY(${frontierArr})`,
+            ? inArray(lineageEdges.toFqn, frontierArr)
+            : or(
+                inArray(lineageEdges.fromFqn, frontierArr),
+                inArray(lineageEdges.toFqn, frontierArr),
+              ),
       );
 
     const next = new Set<string>();
@@ -108,7 +111,7 @@ export const getLineageSubgraph = async (
       raw: entities.raw,
     })
     .from(entities)
-    .where(sql`${entities.fqn} = ANY(${Array.from(visited)})`)) as EntityRow[];
+    .where(inArray(entities.fqn, Array.from(visited)))) as EntityRow[];
 
   const nodes: GraphNode[] = nodeRows.map((r) => {
     const { riskScore, topCause } = extractRisk(r.raw);

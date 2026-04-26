@@ -15,10 +15,12 @@
     "seed:om": "tsx scripts/seed-om.ts",
     "incidents:inject": "tsx scripts/inject-incidents.ts",
     "incidents:clear": "tsx scripts/inject-incidents.ts --clear",
-    "backtest": "tsx scripts/backtest.ts"
+    "backtest": "tsx scripts/backtest.ts",
+    "demo:seed": "tsx scripts/demo-seed-timescale.ts"
   },
   "dependencies": {
-    "@causalops/om-client": "workspace:*"
+    "@causalops/om-client": "workspace:*",
+    "postgres": "^3.4.5"
   },
   "devDependencies": {
     "@types/node": "^20.17.6",
