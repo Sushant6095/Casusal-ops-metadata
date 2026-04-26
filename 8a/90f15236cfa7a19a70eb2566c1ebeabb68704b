@@ -1,0 +1,25 @@
+docs/voiceover-script.txt
+  0d48c038ea8e26d3 1-23
+docs/AI-VIDEO-PRODUCTION.md
+  0d48c038ea8e26d3 1-340
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "8a90f15236cfa7a19a70eb2566c1ebeabb68704b",
+  "prompts": {
+    "0d48c038ea8e26d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84d13c6e-19d6-4f81-bc92-9231b8f16da4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sushant",
+      "messages": [],
+      "total_additions": 363,
+      "total_deletions": 0,
+      "accepted_lines": 364,
+      "overriden_lines": 0
+    }
+  }
+}
