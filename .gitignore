@@ -9,3 +9,4 @@ dist
 .venv
 scripts/.incidents-ground-truth.json
 *.pytest_cache*
+*.tsbuildinfo
