@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "11583aa3b2895d277bc9556f1249846d6caa26b5",
+  "prompts": {
+    "0d48c038ea8e26d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84d13c6e-19d6-4f81-bc92-9231b8f16da4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sushant",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 66,
+      "accepted_lines": 262,
+      "overriden_lines": 0
+    }
+  }
+}
