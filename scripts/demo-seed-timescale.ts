@@ -120,27 +120,40 @@ interface ChangeEventSeed {
   description: string;
 }
 
+// orders → revenue_view: tightly aligned (schema change ~30 min before each rv failure)
+// This makes the causal engine pick orders as the top cause for revenue_view.
+const ORDERS_REVENUE_PAIRS = [0.5, 4, 14, 50, 100, 150, 200, 260, 320, 400, 500, 600];
+const NOISE_HOURS = [11, 27, 55, 88, 115, 170, 240, 380, 540];
+
 const CHANGE_EVENTS: ChangeEventSeed[] = [
-  { entityFqn: fqnTable(SALES, "orders"), entityType: "table", eventType: "entityUpdated", hoursAgo: 3, description: "schema: added/removed transient column price_v2" },
-  { entityFqn: fqnTable(SALES, "orders"), entityType: "table", eventType: "entityUpdated", hoursAgo: 6, description: "owner rotated" },
-  { entityFqn: fqnTable(SALES, "users"), entityType: "table", eventType: "entityUpdated", hoursAgo: 4, description: "phone column nullable: upstream sync" },
+  // === Causal cluster: orders.price schema events 0.4–0.6h before each revenue_view failure ===
+  ...ORDERS_REVENUE_PAIRS.map(
+    (h, i): ChangeEventSeed => ({
+      entityFqn: fqnTable(SALES, "orders"),
+      entityType: "table",
+      eventType: "entityUpdated",
+      hoursAgo: h + 0.5,
+      description: `schema: added/removed transient column price_audit_${i}`,
+    }),
+  ),
+  // === Noise events on other entities — uncorrelated with revenue_view failures ===
+  ...NOISE_HOURS.map(
+    (h): ChangeEventSeed => ({
+      entityFqn: fqnTable(SALES, "users"),
+      entityType: "table",
+      eventType: "entityUpdated",
+      hoursAgo: h,
+      description: "email regex / phone null / owner rotated",
+    }),
+  ),
   { entityFqn: fqnTable(MKT, "campaigns"), entityType: "table", eventType: "entityUpdated", hoursAgo: 5, description: "discount_code renamed → promo_code then back" },
-  { entityFqn: fqnTable(SALES, "orders"), entityType: "table", eventType: "entityUpdated", hoursAgo: 12, description: "tz fixed UTC+0 → source-local" },
-  { entityFqn: fqnTable(SALES, "users"), entityType: "table", eventType: "entityUpdated", hoursAgo: 18, description: "email regex tightened to RFC 5322" },
-  { entityFqn: fqnTable(SALES, "revenue_view"), entityType: "table", eventType: "entityUpdated", hoursAgo: 22, description: "clarified day column semantics" },
   { entityFqn: fqnTable(MKT, "campaigns"), entityType: "table", eventType: "entityUpdated", hoursAgo: 28, description: "applied PII.Sensitive tag" },
-  { entityFqn: fqnPipe("daily_campaign_etl"), entityType: "pipeline", eventType: "pipelineStatusFail", hoursAgo: 1, description: "run FAILED at attribution step" },
-  { entityFqn: fqnPipe("orders_ingest"), entityType: "pipeline", eventType: "pipelineStatusFail", hoursAgo: 9, description: "source API timeout" },
-  { entityFqn: fqnTable(SALES, "orders"), entityType: "table", eventType: "entityUpdated", hoursAgo: 36, description: "schema: widened price decimal precision" },
   { entityFqn: fqnTable(MKT, "campaigns"), entityType: "table", eventType: "entityUpdated", hoursAgo: 48, description: "starts_at description added" },
-  { entityFqn: fqnTable(SALES, "users"), entityType: "table", eventType: "entityUpdated", hoursAgo: 60, description: "ownership rotated" },
-  { entityFqn: fqnTable(SALES, "orders"), entityType: "table", eventType: "entityUpdated", hoursAgo: 72, description: "schema: add+drop transient price_audit col" },
-  { entityFqn: fqnTable(MKT, "campaign_attribution"), entityType: "table", eventType: "entityUpdated", hoursAgo: 90, description: "ownership rotated" },
+  { entityFqn: fqnPipe("daily_campaign_etl"), entityType: "pipeline", eventType: "pipelineStatusFail", hoursAgo: 1, description: "run FAILED at attribution step" },
   { entityFqn: fqnPipe("daily_campaign_etl"), entityType: "pipeline", eventType: "pipelineStatusFail", hoursAgo: 96, description: "pipeline failed mid-transform" },
-  { entityFqn: fqnTable(SALES, "users"), entityType: "table", eventType: "entityUpdated", hoursAgo: 108, description: "email column widened VARCHAR 255 → 512" },
-  { entityFqn: fqnTable(MKT, "campaigns"), entityType: "table", eventType: "entityUpdated", hoursAgo: 132, description: "owner contact info updated" },
+  { entityFqn: fqnPipe("orders_ingest"), entityType: "pipeline", eventType: "pipelineStatusFail", hoursAgo: 9, description: "source API timeout" },
+  { entityFqn: fqnTable(MKT, "campaign_attribution"), entityType: "table", eventType: "entityUpdated", hoursAgo: 90, description: "ownership rotated" },
   { entityFqn: fqnTable(SALES, "revenue_view"), entityType: "table", eventType: "entityUpdated", hoursAgo: 156, description: "tag Tier.Gold applied" },
-  { entityFqn: fqnTable(SALES, "orders"), entityType: "table", eventType: "entityUpdated", hoursAgo: 180, description: "user_id FK description clarified" },
 ];
 
 interface TestResultSeed {
@@ -151,19 +164,24 @@ interface TestResultSeed {
 }
 
 const TEST_RESULTS: TestResultSeed[] = [
-  // recent failures (cluster of activity)
-  { testCaseFqn: `${fqnTable(SALES, "revenue_view")}.revenue_view_row_count`, entityFqn: fqnTable(SALES, "revenue_view"), status: "Failed", hoursAgo: 0.5 },
-  { testCaseFqn: `${fqnTable(SALES, "revenue_view")}.revenue_view_row_count`, entityFqn: fqnTable(SALES, "revenue_view"), status: "Failed", hoursAgo: 4 },
+  // === Failures aligned with orders.price treatments (causal cluster) ===
+  ...ORDERS_REVENUE_PAIRS.map(
+    (h): TestResultSeed => ({
+      testCaseFqn: `${fqnTable(SALES, "revenue_view")}.revenue_view_row_count`,
+      entityFqn: fqnTable(SALES, "revenue_view"),
+      status: "Failed" as const,
+      hoursAgo: h,
+    }),
+  ),
+  // === Other recent failures (visible in UI but not on revenue_view) ===
   { testCaseFqn: `${fqnTable(MKT, "campaign_attribution")}.attribution_row_count`, entityFqn: fqnTable(MKT, "campaign_attribution"), status: "Failed", hoursAgo: 2 },
   { testCaseFqn: `${fqnTable(MKT, "campaign_attribution")}.attribution_row_count`, entityFqn: fqnTable(MKT, "campaign_attribution"), status: "Failed", hoursAgo: 7 },
   { testCaseFqn: `${fqnTable(SALES, "users")}.users_email_format`, entityFqn: fqnTable(SALES, "users"), status: "Failed", hoursAgo: 6 },
   { testCaseFqn: `${fqnTable(SALES, "orders")}.orders_price_not_null`, entityFqn: fqnTable(SALES, "orders"), status: "Failed", hoursAgo: 8 },
   { testCaseFqn: `${fqnTable(SALES, "orders")}.orders_created_at_freshness`, entityFqn: fqnTable(SALES, "orders"), status: "Failed", hoursAgo: 10 },
-  { testCaseFqn: `${fqnTable(SALES, "revenue_view")}.revenue_view_row_count`, entityFqn: fqnTable(SALES, "revenue_view"), status: "Failed", hoursAgo: 14 },
   { testCaseFqn: `${fqnTable(MKT, "campaign_attribution")}.attribution_row_count`, entityFqn: fqnTable(MKT, "campaign_attribution"), status: "Failed", hoursAgo: 20 },
   { testCaseFqn: `${fqnTable(SALES, "users")}.users_email_format`, entityFqn: fqnTable(SALES, "users"), status: "Failed", hoursAgo: 26 },
   { testCaseFqn: `${fqnTable(SALES, "orders")}.orders_created_at_freshness`, entityFqn: fqnTable(SALES, "orders"), status: "Failed", hoursAgo: 35 },
-  { testCaseFqn: `${fqnTable(SALES, "revenue_view")}.revenue_view_row_count`, entityFqn: fqnTable(SALES, "revenue_view"), status: "Failed", hoursAgo: 50 },
   { testCaseFqn: `${fqnTable(MKT, "campaign_attribution")}.attribution_row_count`, entityFqn: fqnTable(MKT, "campaign_attribution"), status: "Failed", hoursAgo: 70 },
   { testCaseFqn: `${fqnTable(SALES, "orders")}.orders_price_not_null`, entityFqn: fqnTable(SALES, "orders"), status: "Failed", hoursAgo: 96 },
   { testCaseFqn: `${fqnTable(SALES, "users")}.users_email_format`, entityFqn: fqnTable(SALES, "users"), status: "Failed", hoursAgo: 130 },
