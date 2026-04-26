@@ -123,36 +123,167 @@ pnpm backtest
 
 ---
 
-## 🚀 Quickstart
+## 🚀 Run it yourself
+
+A fork-friendly guide. Follow top-to-bottom; takes ~10 min on a warm cache, ~20 min cold (image pulls + npm + pip).
+
+### 1 · Prerequisites
+
+| Tool | Version | Install |
+|---|---|---|
+| **Docker Desktop** | 24+ | <https://docs.docker.com/desktop> |
+| **Node.js** | 20 LTS | `nvm install 20` or <https://nodejs.org> |
+| **pnpm** | 9.14.4 | `corepack enable && corepack prepare pnpm@9.14.4 --activate` |
+| **Python** | 3.12 | `brew install python@3.12` (macOS) · `apt install python3.12 python3.12-venv` (Debian/Ubuntu) |
+| **Git** | any recent | preinstalled on macOS / `apt install git` |
+
+Hardware: **8 GB RAM minimum** (OpenMetadata + OpenSearch + Postgres + Redis is hungry). 16 GB if you also run a browser + IDE.
+
+### 2 · Fork + clone
+
+1. Click **Fork** at the top-right of <https://github.com/Sushant6095/Casusal-ops-metadata>
+2. Clone your fork:
 
 ```bash
-# 1. Setup
-git clone https://github.com/Sushant6095/Casusal-ops-metadata.git CausalOps
+git clone https://github.com/<your-username>/Casusal-ops-metadata.git CausalOps
 cd CausalOps
-cp .env.example .env                                 # paste your OM_JWT_TOKEN
+```
 
-# 2. Infra — Postgres + Timescale + Redis + OM
-docker compose up -d                                 # ~3 min for OM cold start
+### 3 · Configure environment
 
-# 3. Install + build
+```bash
+cp .env.example .env
+```
+
+Open `.env` in your editor. Defaults work for local dev — only **two** values may need changing:
+
+| Variable | When to change | How to get it |
+|---|---|---|
+| `OM_JWT_TOKEN` | Only if you want full OM round-trip (lineage poll, risk write-back). Skip for the no-OM-token demo path. | OM UI → Settings → Bots → `ingestion-bot` → Reveal Token |
+| `OPENAI_API_KEY` | Only if you want LLM narration in the EvidencePanel | <https://platform.openai.com/api-keys> · `gpt-4o-mini` is enough |
+
+Everything else (`TIMESCALE_URL`, `REDIS_URL`, `CAUSAL_WORKER_URL`, ports) already points at the local Docker stack.
+
+### 4 · Pick a path
+
+#### 🅰 No-OM-token path (fastest, recommended for first run)
+
+Bypasses OpenMetadata entirely — `pnpm demo:seed` writes 9 entities, 29 events, and 63 DQ results straight into TimescaleDB. Lets you see the full UI working in ~5 min.
+
+```bash
+# Start only the infra you need (skip OM)
+docker compose up -d timescaledb postgres redis
+
+# Install + build packages
 pnpm install
 pnpm --filter @causalops/om-client build
 pnpm --filter @causalops/ingestor build
 pnpm --filter @causalops/api build
 
-# 4. Migrate + seed
+# Create Timescale schema + populate demo data
 pnpm --filter @causalops/ingestor db:migrate
-pnpm demo:seed                                       # 9 entities, 29 events, 63 results
-
-# 5. Run all services (3 terminals)
-node apps/api/dist/server.js                         # :3001
-pnpm --filter @causalops/web dev                     # :3000
-services/causal-worker/.venv/bin/python -m uvicorn src.main:app --port 8000
+pnpm demo:seed
 ```
 
-Open <http://localhost:3000>.
+#### 🅱 Full OM integration
 
-> 🩺 **Health check:** `curl localhost:3001/health localhost:8000/health localhost:3000` — should all return 200.
+Boots the full stack. Adds ~5 min for OM cold-start.
+
+```bash
+docker compose up -d                              # everything
+# wait for OM to be healthy (~3 min)
+curl -fs http://localhost:8586/healthcheck && echo OK
+
+pnpm install
+pnpm --filter @causalops/om-client build
+pnpm --filter @causalops/ingestor build
+pnpm --filter @causalops/api build
+pnpm --filter @causalops/ingestor db:migrate
+
+# Now seed OM with demo entities + 20 ground-truth incidents
+pnpm seed:om
+pnpm incidents:inject --seed 42
+# Wait ~2 min for the ingestor to poll OM and populate Timescale
+```
+
+### 5 · Set up the Python causal worker
+
+```bash
+cd services/causal-worker
+python3.12 -m venv .venv
+.venv/bin/pip install fastapi 'uvicorn[standard]' asyncpg pydantic numpy pandas networkx scikit-learn
+# Optional heavy deps for production-grade inference:
+# .venv/bin/pip install dowhy econml causal-learn
+cd ../..
+```
+
+### 6 · Run the four services
+
+Open **4 terminals**, run one command in each:
+
+```bash
+# Terminal 1 — API (Fastify + tRPC, port 3001)
+TIMESCALE_URL='postgres://causalops:causalops@localhost:5433/events' \
+OM_HOST=http://localhost:8585 \
+OM_JWT_TOKEN="${OM_JWT_TOKEN:-dev-placeholder}" \
+node apps/api/dist/server.js
+
+# Terminal 2 — Web (Next.js, port 3000)
+pnpm --filter @causalops/web dev
+
+# Terminal 3 — Causal worker (FastAPI, port 8000)
+TIMESCALE_URL='postgres://causalops:causalops@localhost:5433/events' \
+PYTHONPATH=services/causal-worker \
+services/causal-worker/.venv/bin/python -m uvicorn src.main:app --host 0.0.0.0 --port 8000
+
+# Terminal 4 (Path B only) — Ingestor
+METRICS_PORT=9091 \
+REDIS_URL=redis://localhost:6379 \
+TIMESCALE_URL='postgres://causalops:causalops@localhost:5433/events' \
+OM_HOST=http://localhost:8585 \
+OM_JWT_TOKEN="$OM_JWT_TOKEN" \
+node packages/ingestor/dist/index.js
+```
+
+### 7 · Verify it's running
+
+```bash
+for s in 3000 3001/health 8000/health; do
+  printf "  %-15s %s\n" "$s" "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:$s)"
+done
+```
+
+All three should print `200`. Then open <http://localhost:3000> — you should see real failures, a populated graph, and 80% top-1 accuracy in the stat cards.
+
+### 8 · Try the demos
+
+| Goal | Steps |
+|---|---|
+| **See ranked causes for a failure** | Click any red row on Home → click **Run RCA** on the next page |
+| **Forecast blast radius** | Sidebar → **What-if** → fill `discount_code` → **Simulate** |
+| **Run the back-test** | `pnpm backtest` (Path B) or `pnpm backtest --offline` (Path A) — should print `80% top-1 vs 50% baseline` |
+| **MCP from Claude Desktop** | Build with `pnpm --filter @causalops/mcp build`, then paste the [Claude Desktop config](#claude-desktop-config) below into `~/Library/Application Support/Claude/claude_desktop_config.json` |
+
+### 🩺 Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `EADDRINUSE :3001` | Another process owns the port: `lsof -ti :3001 \| xargs kill -9` |
+| Web shows "Could not load failures" | Check api/worker are up. Hard-refresh browser (`⌘⇧R`). |
+| RCA returns empty `ranked` | TimescaleDB has no events yet — re-run `pnpm demo:seed` |
+| OM health check fails | OpenMetadata cold-start takes up to 3 min. Run `docker logs openmetadata-server -f` to watch progress. |
+| `Could not find a declaration file for module '@causalops/om-client'` | Stale tsbuildinfo — `rm -rf packages/*/dist apps/*/dist **/tsconfig.tsbuildinfo` then re-run build chain |
+| Port `9090` collision (ingestor metrics) | Set `METRICS_PORT=9091` (already in the example above) |
+| `pnpm demo:seed` fails on `relation "entities" does not exist` | Run `pnpm --filter @causalops/ingestor db:migrate` first |
+
+### Reset everything
+
+```bash
+docker compose down -v                       # nukes all volumes
+rm -rf node_modules packages/*/dist apps/*/dist apps/web/.next
+pnpm install
+# then start over from step 4
+```
 
 ---
 
