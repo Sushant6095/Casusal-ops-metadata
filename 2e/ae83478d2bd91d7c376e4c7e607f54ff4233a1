@@ -1,0 +1,287 @@
+services/causal-worker/src/models.py
+  0d48c038ea8e26d3 1-75
+apps/mcp/src/tools/types.ts
+  0d48c038ea8e26d3 1-11
+apps/mcp/src/tests/tools.test.ts
+  0d48c038ea8e26d3 1-132
+packages/ingestor/drizzle.config.ts
+  0d48c038ea8e26d3 1-14
+apps/web/next-env.d.ts
+  0d48c038ea8e26d3 1-5
+apps/web/app/page.tsx
+  0d48c038ea8e26d3 1-204
+packages/ingestor/src/cursors.ts
+  0d48c038ea8e26d3 1-37
+packages/ingestor/src/logger.ts
+  0d48c038ea8e26d3 1-7
+services/causal-worker/src/scm_fit.py
+  0d48c038ea8e26d3 1-210
+apps/mcp/mcp.config.json
+  0d48c038ea8e26d3 1-40
+apps/api/src/context.ts
+  0d48c038ea8e26d3 1-81
+packages/om-client/src/client.ts
+  0d48c038ea8e26d3 1-105
+apps/web/app/why/[entityFqn]/page.tsx
+  0d48c038ea8e26d3 1-142
+services/causal-worker/src/intervention.py
+  0d48c038ea8e26d3 1-95
+.claude/settings.json
+  0d48c038ea8e26d3 8-15
+docs/backtest-report.md
+  0d48c038ea8e26d3 1-42
+apps/web/components/ui/Card.tsx
+  0d48c038ea8e26d3 4-38
+apps/mcp/src/tools/simulateIntervention.ts
+  0d48c038ea8e26d3 1-56
+scripts/lib/fixtures.ts
+  0d48c038ea8e26d3 1-279
+apps/mcp/src/apiClient.ts
+  0d48c038ea8e26d3 1-17
+apps/web/components/ConfidenceBadge.tsx
+  0d48c038ea8e26d3 1-13
+apps/mcp/tsconfig.json
+  0d48c038ea8e26d3 1-14
+apps/api/src/services/narrator.ts
+  0d48c038ea8e26d3 1-48
+apps/web/components/RiskBarChart.tsx
+  0d48c038ea8e26d3 2-72
+services/causal-worker/src/db.py
+  0d48c038ea8e26d3 1-51
+apps/web/app/layout.tsx
+  0d48c038ea8e26d3 1-32
+packages/ingestor/src/jobs/pollEvents.ts
+  0d48c038ea8e26d3 1-84
+apps/api/vitest.config.ts
+  0d48c038ea8e26d3 1-9
+apps/mcp/src/tools/getRiskScore.ts
+  0d48c038ea8e26d3 1-51
+apps/web/app/globals.css
+  0d48c038ea8e26d3 1-100
+apps/api/src/routers/counterfactual.ts
+  0d48c038ea8e26d3 1-95
+packages/ingestor/package.json
+  0d48c038ea8e26d3 13-22
+packages/om-client/src/types.ts
+  0d48c038ea8e26d3 1-161
+packages/om-client/src/events.ts
+  0d48c038ea8e26d3 1-71
+apps/web/package.json
+  0d48c038ea8e26d3 1-43
+turbo.json
+  0d48c038ea8e26d3 1-18
+packages/ingestor/tsconfig.json
+  0d48c038ea8e26d3 1-8,11-14
+packages/om-client/src/__tests__/client.test.ts
+  0d48c038ea8e26d3 1-11,13-14,16,18-20,22-23,25-42,44-61,63-77,79-96,98-110,112-129,131-147
+services/causal-worker/src/refutation.py
+  0d48c038ea8e26d3 1-57
+README.md
+  0d48c038ea8e26d3 1-187
+apps/web/components/EvidencePanel.tsx
+  0d48c038ea8e26d3 1-55
+tsconfig.base.json
+  0d48c038ea8e26d3 1-24
+packages/om-client/package.json
+  0d48c038ea8e26d3 1-37
+apps/web/components/TopBar.tsx
+  0d48c038ea8e26d3 2-58
+apps/api/src/logger.ts
+  0d48c038ea8e26d3 1-6
+apps/web/components/BlastRadiusMap.tsx
+  0d48c038ea8e26d3 1-41
+apps/web/hooks/useGraphData.ts
+  0d48c038ea8e26d3 1-12
+packages/ingestor/src/jobs/pollTestResults.ts
+  0d48c038ea8e26d3 1-89
+docker-compose.yml
+  0d48c038ea8e26d3 151-163
+packages/om-client/tsconfig.json
+  0d48c038ea8e26d3 1-13
+services/causal-worker/pyproject.toml
+  0d48c038ea8e26d3 1-44
+services/causal-worker/src/counterfactual.py
+  0d48c038ea8e26d3 1-130
+apps/web/components/CausalGraph.tsx
+  0d48c038ea8e26d3 91-289
+apps/web/components/TimelineScrubber.tsx
+  0d48c038ea8e26d3 1-30
+apps/web/components/ui/Button.tsx
+  0d48c038ea8e26d3 1-31
+apps/api/tsconfig.tsbuildinfo
+  0d48c038ea8e26d3 1
+apps/web/app/providers.tsx
+  0d48c038ea8e26d3 1-24
+apps/web/components/ui/Badge.tsx
+  0d48c038ea8e26d3 1-25
+apps/api/src/routers/events.ts
+  0d48c038ea8e26d3 1-51
+scripts/tsconfig.json
+  0d48c038ea8e26d3 1-11
+apps/api/tsconfig.json
+  0d48c038ea8e26d3 9-10
+packages/ingestor/src/queue.ts
+  0d48c038ea8e26d3 1-107
+apps/mcp/tsconfig.tsbuildinfo
+  0d48c038ea8e26d3 1
+apps/web/lib/cn.ts
+  0d48c038ea8e26d3 1-4
+packages/om-client/vitest.config.ts
+  0d48c038ea8e26d3 1-9
+services/causal-worker/Dockerfile
+  0d48c038ea8e26d3 3-6,9-16,18,22-25
+packages/ingestor/src/index.ts
+  0d48c038ea8e26d3 1-42
+apps/api/src/trpc.ts
+  0d48c038ea8e26d3 1-14
+packages/ingestor/src/db/schema.ts
+  0d48c038ea8e26d3 1-107
+services/causal-worker/src/main.py
+  0d48c038ea8e26d3 1-86
+apps/web/components/FailureList.tsx
+  0d48c038ea8e26d3 3-74
+docs/SUBMISSION.md
+  0d48c038ea8e26d3 1-15
+apps/web/app/what-if/page.tsx
+  0d48c038ea8e26d3 1-187
+apps/web/next.config.mjs
+  0d48c038ea8e26d3 1-9
+packages/om-client/src/index.ts
+  0d48c038ea8e26d3 1-47
+pnpm-workspace.yaml
+  0d48c038ea8e26d3 1-3
+packages/ingestor/src/metrics.ts
+  0d48c038ea8e26d3 1-49
+services/causal-worker/src/data_loader.py
+  0d48c038ea8e26d3 1-154
+packages/om-client/src/tables.ts
+  0d48c038ea8e26d3 1-66
+packages/ingestor/src/jobs/pollLineage.ts
+  0d48c038ea8e26d3 1-184
+LICENSE
+  0d48c038ea8e26d3 1-17
+.env.example
+  0d48c038ea8e26d3 6-8
+services/causal-worker/tests/test_counterfactual.py
+  0d48c038ea8e26d3 1-174
+apps/mcp/package.json
+  0d48c038ea8e26d3 1-32
+scripts/inject-incidents.ts
+  0d48c038ea8e26d3 1-386
+scripts/lib/om.ts
+  0d48c038ea8e26d3 1-89
+apps/web/app/why/page.tsx
+  0d48c038ea8e26d3 1-16
+apps/web/postcss.config.mjs
+  0d48c038ea8e26d3 1-3
+apps/mcp/src/tools/rankCauses.ts
+  0d48c038ea8e26d3 1-61
+packages/om-client/src/testResults.ts
+  0d48c038ea8e26d3 1-47
+scripts/lib/incidents.ts
+  0d48c038ea8e26d3 1-440
+scripts/backtest.ts
+  0d48c038ea8e26d3 1-343
+packages/ingestor/vitest.config.ts
+  0d48c038ea8e26d3 1-9
+apps/api/src/routers/failures.ts
+  0d48c038ea8e26d3 1-53
+apps/web/lib/trpc.ts
+  0d48c038ea8e26d3 1-25
+packages/ingestor/src/db/client.ts
+  0d48c038ea8e26d3 1-15
+scripts/seed-om.ts
+  0d48c038ea8e26d3 1-516
+apps/web/components/Sidebar.tsx
+  0d48c038ea8e26d3 4-78
+apps/api/src/services/graphBuilder.ts
+  0d48c038ea8e26d3 1-146
+services/causal-worker/README.md
+  0d48c038ea8e26d3 1-40
+apps/web/components/ui/Skeleton.tsx
+  0d48c038ea8e26d3 1-12
+packages/ingestor/src/tests/pollEvents.test.ts
+  0d48c038ea8e26d3 1-171
+apps/api/src/tests/routers.test.ts
+  0d48c038ea8e26d3 1-220
+apps/api/src/webhooks/omEvents.ts
+  0d48c038ea8e26d3 1-105
+package.json
+  0d48c038ea8e26d3 17-18
+apps/api/src/services/causalClient.ts
+  0d48c038ea8e26d3 1-104
+apps/api/src/routers/graph.ts
+  0d48c038ea8e26d3 1-66
+apps/web/app/api/trpc/[trpc]/route.ts
+  0d48c038ea8e26d3 1-13,18-27
+apps/api/src/server.ts
+  0d48c038ea8e26d3 1-39,42-74
+apps/mcp/vitest.config.ts
+  0d48c038ea8e26d3 1-9
+apps/api/package.json
+  0d48c038ea8e26d3 1-29,31-46
+packages/om-client/src/webhook.ts
+  0d48c038ea8e26d3 1-22
+packages/om-client/tsconfig.tsbuildinfo
+  0d48c038ea8e26d3 1
+packages/ingestor/tsconfig.tsbuildinfo
+  0d48c038ea8e26d3 1
+packages/ingestor/src/jobs/reconcile.ts
+  0d48c038ea8e26d3 1-21
+apps/web/tsconfig.tsbuildinfo
+  0d48c038ea8e26d3 1
+apps/mcp/src/server.ts
+  0d48c038ea8e26d3 1-145
+apps/mcp/src/tools/listFailures.ts
+  0d48c038ea8e26d3 1-45
+apps/web/app/graph/page.tsx
+  0d48c038ea8e26d3 1-157
+packages/ingestor/src/db/migrate.ts
+  0d48c038ea8e26d3 1-32
+apps/api/src/routers/intervention.ts
+  0d48c038ea8e26d3 1-44
+.gitignore
+  0d48c038ea8e26d3 11
+apps/web/components/CandidateRanking.tsx
+  0d48c038ea8e26d3 1-71
+packages/ingestor/src/db/migrations/0000_init.sql
+  0d48c038ea8e26d3 1-68
+apps/api/src/services/omWriteBack.ts
+  0d48c038ea8e26d3 1-26
+apps/web/tailwind.config.ts
+  0d48c038ea8e26d3 1-33
+apps/web/lib/format.ts
+  0d48c038ea8e26d3 1-35
+apps/web/tsconfig.json
+  0d48c038ea8e26d3 1-25
+apps/web/hooks/useLiveEvents.ts
+  0d48c038ea8e26d3 1-41
+apps/web/components/Stat.tsx
+  0d48c038ea8e26d3 1-59
+apps/api/src/routers/index.ts
+  0d48c038ea8e26d3 1-16
+packages/om-client/src/lineage.ts
+  0d48c038ea8e26d3 1-45
+apps/web/components/ui/Separator.tsx
+  0d48c038ea8e26d3 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "2eae83478d2bd91d7c376e4c7e607f54ff4233a1",
+  "prompts": {
+    "0d48c038ea8e26d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84d13c6e-19d6-4f81-bc92-9231b8f16da4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sushant",
+      "messages": [],
+      "total_additions": 17685,
+      "total_deletions": 13159,
+      "accepted_lines": 11293,
+      "overriden_lines": 108
+    }
+  }
+}
