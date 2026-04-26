@@ -1,138 +1,201 @@
-# CausalOps 🧬
+<div align="center">
 
-> Causal inference, not correlation, on top of OpenMetadata.
+# 🧬 CausalOps
 
-![demo](docs/demo.gif) <!-- replace -->
+### Causal inference, not correlation, on top of OpenMetadata.
 
-## Problem
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![tRPC](https://img.shields.io/badge/tRPC-11-2596be?logo=trpc&logoColor=white)](https://trpc.io/)
+[![DoWhy](https://img.shields.io/badge/DoWhy-0.11-7c3aed)](https://www.pywhy.org/dowhy/)
+[![OpenMetadata](https://img.shields.io/badge/OpenMetadata-1.5.13-22c55e)](https://open-metadata.org/)
+[![Hackathon](https://img.shields.io/badge/Hackathon-OpenMetadata-22D3EE)]()
 
-Your pipeline broke at 3 a.m. Fifteen upstream things changed that day.
-OpenMetadata shows you lineage and a list of recent events — it cannot tell
-you which of those fifteen is the cause and which fourteen are coincidences.
-Every hour spent chasing the wrong wire costs another ticket, another SLA,
-another drop in catalog trust.
+**[Live demo](#-the-product) · [Architecture](#-architecture) · [Back-test results](#-back-test-results) · [Quickstart](#-quickstart) · [MCP integration](#-mcp-integration)**
 
-## Solution
+</div>
 
-CausalOps adds a causal-inference layer to OpenMetadata. It absorbs the
-lineage graph as a DAG, fits a structural causal model on the last 30 days
-of change events and DQ test results, and answers questions the catalog
-alone cannot:
+---
 
-- **Counterfactual RCA.** Which upstream event *caused* this failure — not
-  which correlated with it?
-- **Interventional simulation.** If I drop this column, what breaks
-  downstream, with what probability?
-- **Exposed over MCP.** Every tool is callable from OM's chat panel, Claude
-  Desktop, or any MCP client.
+## 🎯 The problem
 
-Nothing is forked. Risk scores land back on OpenMetadata as entity
-extension fields. Judges can test the whole stack with one
-`docker compose up`.
+> *It's 3 a.m. Your pipeline broke. OpenMetadata shows you fifteen things that changed upstream that day. Which one is the cause? Which fourteen are coincidences?*
 
-## Demo screenshots
+OpenMetadata gives you **lineage + a list of events**. It cannot answer *why*. So oncalls fall back to **"the most recent upstream change wins"** — a heuristic that gets the wrong answer **half the time**, because confounded coincidences fire on every alert. That's how teams burn 4 hours chasing the wrong wire.
 
-| | |
-|---|---|
-| ![home](docs/screenshots/home.png) <!-- replace --> | ![graph](docs/screenshots/graph.png) <!-- replace --> |
-| `/` — Home, failures + top risks | `/graph` — Lineage + risk overlay |
-| ![why](docs/screenshots/why.png) <!-- replace --> | ![what-if](docs/screenshots/what-if.png) <!-- replace --> |
-| `/why/[fqn]` — Ranked causes | `/what-if` — Blast-radius simulator |
+## ✨ The solution
 
-## Back-test results
+CausalOps adds a **causal-inference layer** on top of OpenMetadata. It treats lineage as a **causal graph**, fits a **structural causal model** over your change events and DQ test results, and answers two questions the catalog cannot:
 
-Twenty ground-truth incidents (10 true causal + 10 confounded coincident).
+| Question | Flow | Algorithm |
+|---|---|---|
+| **Why did this fail?** | Counterfactual RCA | Backdoor adjustment + propensity-score matching |
+| **What breaks if I deploy this?** | Intervention simulation | Monte-Carlo forward propagation |
 
-| Metric | CausalOps | Baseline (recency) |
-|--------|-----------|--------------------|
-| Top-1 accuracy (true causes) | **80%** | 50% |
-| Top-3 hit rate (true causes) | 100% | — |
-| Mean reciprocal rank         | 0.900 | — |
-| False-positive rate (confounded wrongly picked) | 30% | 100% |
-| Overall correctness            | **75%** | 50% |
+Every answer ships with **placebo p-values, subset stability, and 95% confidence intervals** — so you can tell a confident model from a correct one.
 
-Full per-incident breakdown: [docs/backtest-report.md](docs/backtest-report.md).
+> 🏆 **Validated:** 80% top-1 accuracy vs 50% recency baseline on 20 ground-truth incidents.
 
-Reproduce:
+---
+
+## 📸 The product
+
+### Home — failures + risk at a glance
+
+![Home — CausalOps Dashboard](docs/screenshots/home.png)
+
+> Dark-mode dashboard with a gradient-mesh background. The hero card frames the value prop. Four stat cards expose key health metrics. Recent failures stream in on the left; entities ranked by risk on the right. Hit *Investigate a failure* to drop into RCA, or *Simulate a change* to forecast blast radius.
+
+---
+
+### Graph — lineage as a causal DAG
+
+![Graph — Lineage DAG](docs/screenshots/graph.png)
+
+> Force-directed DAG with risk-coloured nodes. The cyan-ringed `revenue_view` is the entity in focus. `campaign_attribution` glows red (risk 0.71), `Marketing-Attribution` glows amber (risk 0.62). Filter by entity type, scrub the time window, click any node for owner / risk score / action buttons.
+
+---
+
+### What-if — interventional blast radius
+
+![What-if — Intervention Simulator](docs/screenshots/what-if.png)
+
+> Pre-fill target entity, action (`drop_column`), and column. Slide Monte-Carlo samples up to 5000. The simulator runs forward propagation through the causal subgraph and returns per-asset breakage probabilities. The path column shows *why* — `discount_code referenced in join`, etc.
+
+---
+
+### Why — counterfactual RCA *(coming soon — see [demo video](#-demo-video))*
+
+> Three-column layout: 14-day upstream events on the left, upstream-only DAG in the middle with the failed outcome ringed cyan, ranked candidate causes on the right. Click any cause to expand the EvidencePanel — effect size, P(factual), P(counterfactual), 95% CI, placebo p-value, subset stability, and the method used.
+
+---
+
+## 🎬 Demo video
+
+Watch the 3-minute walkthrough: **[YouTube](#)** *(replace with your link)*
+
+For a step-by-step breakdown of every click, see [`docs/END-TO-END-DEMO.md`](docs/END-TO-END-DEMO.md).
+
+---
+
+## 📊 Back-test results
+
+> The model is only as good as its validation. We injected **20 ground-truth incidents** — 10 true causal pairs and 10 confounded coincidences — and replayed them through both CausalOps and a naive recency baseline.
+
+| Metric | CausalOps | Baseline (most-recent-wins) |
+|---|---|---|
+| **Top-1 accuracy** *(true causes)* | **80%** | 50% |
+| Top-3 hit rate *(true causes)* | **100%** | — |
+| Mean reciprocal rank | **0.900** | — |
+| False-positive rate *(confounded picked)* | 30% | 100% |
+| **Overall correctness** | **75%** | 50% |
+
+Full per-incident breakdown: [`docs/backtest-report.md`](docs/backtest-report.md).
 
 ```bash
 pnpm incidents:inject --seed 42
 pnpm backtest
 ```
 
-## Architecture
+---
 
-![architecture](docs/architecture.svg)
+## 🏗️ Architecture
 
-Deeper write-up with mermaid sequence diagrams:
-[docs/architecture.md](docs/architecture.md).
+![Architecture](docs/architecture.svg)
 
-## OpenMetadata integration
-
-| Endpoint | Purpose | Where in code |
-|----------|---------|---------------|
-| `GET /lineage/table/name/{fqn}` | Build causal DAG | [packages/ingestor/src/jobs/pollLineage.ts](packages/ingestor/src/jobs/pollLineage.ts) |
-| `GET /events` | Collect treatments (schema, owner, tag, desc changes) | [packages/ingestor/src/jobs/pollEvents.ts](packages/ingestor/src/jobs/pollEvents.ts) |
-| `GET /dataQuality/testCases/testCaseResults` | Collect outcomes | [packages/ingestor/src/jobs/pollTestResults.ts](packages/ingestor/src/jobs/pollTestResults.ts) |
-| `PUT /lineage` | Seed column-level lineage | [scripts/seed-om.ts](scripts/seed-om.ts) |
-| `PATCH /tables/name/{fqn}` (JSON Patch) | Write-back risk score + top cause to entity `extension` | [apps/api/src/services/omWriteBack.ts](apps/api/src/services/omWriteBack.ts) |
-| `POST /webhook/om` (receiver) | Live ingestion of OM ChangeEvents | [apps/api/src/webhooks/omEvents.ts](apps/api/src/webhooks/omEvents.ts) |
-| `POST /events/subscriptions` | Register CausalOps as a subscription endpoint | [packages/om-client/src/webhook.ts](packages/om-client/src/webhook.ts) |
-
-## Tech stack
-
-**TypeScript services**
-- Monorepo: pnpm 9 + turborepo
-- Next.js 15 (App Router) + React 19 RC + Tailwind + D3
-- Fastify 5 + tRPC 11 + Drizzle ORM + postgres-js
-- BullMQ + Redis 7 for scheduling
-- @modelcontextprotocol/sdk 1.x for MCP
-
-**Python worker** (only Python in the repo)
-- FastAPI + asyncpg
-- DoWhy + EconML + scikit-learn + causal-learn + NetworkX
-
-**Data plane**
-- OpenMetadata 1.5.13 (official images)
-- TimescaleDB (pg16) — 1-day hypertable chunks for event/result streams
-- Postgres 16 for app state
-
-## Quickstart
-
-```bash
-# 1. env
-cp .env.example .env            # paste an OM bot JWT into OM_JWT_TOKEN
-
-# 2. infra
-docker compose up -d            # OM + Timescale + Postgres + Redis + worker
-# wait ~3 min for OM cold start
-
-# 3. install + migrate + seed
-pnpm install
-pnpm --filter @causalops/ingestor build
-pnpm --filter @causalops/ingestor db:migrate
-pnpm --filter @causalops/api build
-pnpm seed:om
-pnpm incidents:inject --seed 42
-
-# 4. dev (boots api, web, ingestor, mcp via turbo)
-pnpm dev
+```
+OpenMetadata ──▶ Ingestor ──▶ TimescaleDB ──▶ Causal worker (Python)
+                                  │                  │
+                                  ▼                  │
+                                  API ◀──────────────┘
+                                  │
+                            ┌─────┴─────┐
+                            ▼           ▼
+                          Web UI       MCP server
+                                          │
+                                          ▼
+                              OM chat / Claude Desktop
 ```
 
-Then open `http://localhost:3000`.
+| Layer | Service | Tech |
+|---|---|---|
+| **Source of truth** | OpenMetadata | OM 1.5.13 — lineage, events, DQ, tags |
+| **Stream ingest** | `packages/ingestor` | BullMQ + Drizzle + postgres-js |
+| **Storage** | TimescaleDB | 1-day hypertable chunks for events + results |
+| **Causal engine** | `services/causal-worker` | FastAPI · DoWhy · EconML · NetworkX |
+| **API** | `apps/api` | Fastify 5 + tRPC 11 + Zod |
+| **Web** | `apps/web` | Next.js 15 + React 19 + D3 + Tailwind |
+| **MCP** | `apps/mcp` | @modelcontextprotocol/sdk · stdio + SSE |
 
-## Reproduce the demo
+Deeper write-up with sequence diagrams: [`docs/architecture.md`](docs/architecture.md).
 
-1. Wait for OM to be healthy (`curl http://localhost:8586/healthcheck`).
-2. `pnpm seed:om` — creates 3 services, 5 tables, lineage, DQ tests, PII tags.
-3. `pnpm incidents:inject --seed 42` — writes 20 ground-truth incidents.
-4. Visit `/why/demo_postgres.default.sales.revenue_view` → click **Run RCA**.
-5. Visit `/what-if` → target `orders`, action `drop_column`, column
-   `discount_code` → **Simulate**.
-6. `pnpm backtest` for the validation numbers, or connect
-   `apps/mcp/mcp.config.json` into OpenMetadata's chat or Claude Desktop.
+---
 
-### Claude Desktop MCP config
+## 🔌 OpenMetadata integration
+
+Every interaction with OM is intentional and traceable.
+
+| Endpoint | Purpose | Code path |
+|---|---|---|
+| `GET /lineage/table/name/{fqn}` | Build the causal DAG | [`pollLineage.ts`](packages/ingestor/src/jobs/pollLineage.ts) |
+| `GET /events` | Collect treatments (schema/owner/tag/desc changes) | [`pollEvents.ts`](packages/ingestor/src/jobs/pollEvents.ts) |
+| `GET /dataQuality/testCases/testCaseResults` | Collect outcomes (DQ failures) | [`pollTestResults.ts`](packages/ingestor/src/jobs/pollTestResults.ts) |
+| `PUT /lineage` | Seed column-level lineage in demos | [`seed-om.ts`](scripts/seed-om.ts) |
+| `PATCH /tables/name/{fqn}` *(JSON Patch)* | Write **risk score + top cause** back to entity `extension` | [`omWriteBack.ts`](apps/api/src/services/omWriteBack.ts) |
+| `POST /webhook/om` *(receiver)* | Live-ingest OM ChangeEvents | [`omEvents.ts`](apps/api/src/webhooks/omEvents.ts) |
+| `POST /events/subscriptions` | Register CausalOps as an OM subscription target | [`webhook.ts`](packages/om-client/src/webhook.ts) |
+
+---
+
+## 🚀 Quickstart
+
+```bash
+# 1. Setup
+git clone https://github.com/Sushant6095/Casusal-ops-metadata.git CausalOps
+cd CausalOps
+cp .env.example .env                                 # paste your OM_JWT_TOKEN
+
+# 2. Infra — Postgres + Timescale + Redis + OM
+docker compose up -d                                 # ~3 min for OM cold start
+
+# 3. Install + build
+pnpm install
+pnpm --filter @causalops/om-client build
+pnpm --filter @causalops/ingestor build
+pnpm --filter @causalops/api build
+
+# 4. Migrate + seed
+pnpm --filter @causalops/ingestor db:migrate
+pnpm demo:seed                                       # 9 entities, 29 events, 63 results
+
+# 5. Run all services (3 terminals)
+node apps/api/dist/server.js                         # :3001
+pnpm --filter @causalops/web dev                     # :3000
+services/causal-worker/.venv/bin/python -m uvicorn src.main:app --port 8000
+```
+
+Open <http://localhost:3000>.
+
+> 🩺 **Health check:** `curl localhost:3001/health localhost:8000/health localhost:3000` — should all return 200.
+
+For a no-OM-token mode (demo data only) see [`docs/END-TO-END-DEMO.md`](docs/END-TO-END-DEMO.md).
+
+---
+
+## 🎩 MCP integration
+
+CausalOps exposes 4 tools over the Model Context Protocol — callable from OpenMetadata's chat panel **or** any MCP client.
+
+| Tool | What it does |
+|---|---|
+| `rank_causes` | Counterfactual RCA on a failed outcome |
+| `simulate_intervention` | Blast-radius forecast for a proposed change |
+| `get_risk_score` | Read CausalOps risk score from OM extension |
+| `list_failures` | Recent DQ failures within a window |
+
+### Claude Desktop config
 
 ```json
 {
@@ -146,42 +209,115 @@ Then open `http://localhost:3000`.
 }
 ```
 
-## Theory — what makes this different
+### OpenMetadata MCP host config
 
-See [docs/theory.md](docs/theory.md) for the 2-page primer. In short:
+See [`apps/mcp/mcp.config.json`](apps/mcp/mcp.config.json) — paste into OM Settings → Integrations → MCP Servers.
 
-1. **Correlation is not causation in lineage.** Two tests failing at the
-   same time are usually downstream of a shared cause, not of each other.
-   Recency-based attribution gets this wrong by construction.
-2. **Do-calculus is the right algebra.** `P(Y | do(X))` — what happens if I
-   set X — is a different quantity than `P(Y | X)`. CausalOps computes the
-   former by backdoor adjustment over OM's lineage DAG.
-3. **Backdoor + PSM.** We pick the minimal adjustment set (parents of the
-   treatment, minus descendants), then match propensity scores between
-   treated and untreated buckets. EconML DML kicks in when the adjustment
-   set grows past 20 covariates.
-4. **Every answer comes with refutation.** Placebo permutation p-value and
-   subset stability ship on every evidence panel. "Trust" in the UI is not
-   a tone-of-voice decision; it's a weighted function of both numbers.
+---
 
-## Roadmap
+## 🧠 Theory — what makes this different
 
-- [ ] Column-level DoWhy with SQL-transformation-aware propagation.
-- [ ] Time-varying confounders (Granger + synthetic control baseline).
-- [ ] Slack + PagerDuty narration channels.
-- [ ] Live fit cache invalidation tied to OM webhooks.
-- [ ] Multi-tenant deployments + SSO.
+1. **Correlation ≠ causation in lineage.** Two tests failing at the same time are usually downstream of a *shared* cause, not of each other. Recency-based attribution gets this wrong by construction.
+2. **Do-calculus is the right algebra.** `P(Y | do(X))` is a different quantity than `P(Y | X)`. CausalOps computes the former by **backdoor adjustment** over OM's lineage DAG.
+3. **Backdoor + propensity score matching.** We pick the minimal adjustment set (parents of the treatment, minus descendants), then match propensity scores between treated and untreated time-buckets. EconML's Double-ML kicks in when the adjustment set grows past 20 covariates.
+4. **Refutation is non-negotiable.** Placebo permutation p-value + subset stability ship on every estimate. *Confidence in the UI* is a weighted function of both, not a tone-of-voice decision.
 
-## License
+📖 [`docs/theory.md`](docs/theory.md) — 2-page primer for engineers, not statisticians.
 
-Apache 2.0 — see [LICENSE](LICENSE).
+---
 
-## Acknowledgements
+## 🛠️ Tech stack
 
-- [OpenMetadata](https://open-metadata.org/) and Collate for the catalog
-  and lineage substrate.
-- [DoWhy](https://www.pywhy.org/dowhy/) + [EconML](https://econml.azurewebsites.net/)
-  for the causal-inference plumbing.
-- [TimescaleDB](https://www.timescale.com/) for making 30-day event windows
-  cheap to query.
-- The Model Context Protocol community for making tools-for-LLMs boring.
+<details>
+<summary><b>TypeScript monorepo</b> (pnpm + turborepo)</summary>
+
+- **Web**: Next.js 15 · React 19 RC · Tailwind CSS · D3 force · Lucide · Framer Motion
+- **API**: Fastify 5 · tRPC 11 · Zod · Pino · Prom-client
+- **Ingest**: BullMQ · Drizzle ORM · postgres-js
+- **Shared**: `@causalops/om-client` (Axios + Zod) · `@causalops/ingestor` (drizzle schema)
+- **MCP**: @modelcontextprotocol/sdk · undici · superjson
+
+</details>
+
+<details>
+<summary><b>Python service</b> (only one in the repo)</summary>
+
+- **Web**: FastAPI · uvicorn · pydantic v2
+- **DB**: asyncpg
+- **Causal**: DoWhy · EconML · scikit-learn · causal-learn · NetworkX
+
+</details>
+
+<details>
+<summary><b>Data plane</b></summary>
+
+- **OpenMetadata** 1.5.13 (official Docker images: server, MySQL, OpenSearch, ingestion)
+- **TimescaleDB** (pg16) — 1-day hypertable chunks for `change_events` + `test_case_results`
+- **Postgres 16** for app state
+- **Redis 7** for BullMQ
+
+</details>
+
+---
+
+## 📂 Repository structure
+
+```
+CausalOps-hackathon/
+├── apps/
+│   ├── api/                 # Fastify + tRPC backend
+│   ├── web/                 # Next.js 15 dashboard
+│   └── mcp/                 # Model Context Protocol server
+├── packages/
+│   ├── om-client/           # Typed OpenMetadata REST wrapper (zod + axios)
+│   └── ingestor/            # BullMQ workers + Drizzle schema
+├── services/
+│   └── causal-worker/       # FastAPI + DoWhy + EconML
+├── scripts/
+│   ├── seed-om.ts           # Seed OM with demo entities + lineage
+│   ├── inject-incidents.ts  # 20 ground-truth (treatment, outcome) pairs
+│   ├── demo-seed-timescale.ts # No-OM-token demo seed
+│   └── backtest.ts          # Validation harness
+├── docs/
+│   ├── architecture.md      # System diagrams (mermaid)
+│   ├── theory.md            # Causal inference primer
+│   ├── backtest-report.md   # Per-incident validation
+│   ├── END-TO-END-DEMO.md   # Click-by-click demo guide
+│   ├── video-demo-final.md  # 3-min teleprompter script
+│   └── screenshots/         # Product screenshots
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Column-level DoWhy with SQL-transformation-aware propagation
+- [ ] Time-varying confounders (Granger + synthetic control as additional baselines)
+- [ ] Slack + PagerDuty narration channels — push the causal explanation to the on-call before they open a tab
+- [ ] Live cache invalidation tied to OM webhooks
+- [ ] Multi-tenant deployments + SSO
+
+---
+
+## 📝 License
+
+[Apache 2.0](LICENSE) — use it, fork it, ship it.
+
+## 🙏 Acknowledgements
+
+- [**OpenMetadata**](https://open-metadata.org/) and **Collate** for the catalog and lineage substrate. *None of this works without the platform you've built.*
+- [**DoWhy**](https://www.pywhy.org/dowhy/) and [**EconML**](https://econml.azurewebsites.net/) for the causal-inference plumbing.
+- [**TimescaleDB**](https://www.timescale.com/) for making 30-day event windows cheap.
+- The **Model Context Protocol** community for making tools-for-LLMs boring.
+
+---
+
+<div align="center">
+
+**Built for the OpenMetadata × Collate hackathon.**
+
+⭐ Star the repo if this is useful · [Open an issue](https://github.com/Sushant6095/Casusal-ops-metadata/issues) for questions
+
+</div>
