@@ -44,9 +44,7 @@ Every answer ships with **placebo p-values, subset stability, and 95% confidence
 
 ### Home — failures + risk at a glance
 
-[Home — CausalOps Dashboard](<img width="1465" height="786" alt="Screenshot 2026-04-26 at 11 15 24 PM" src="https://github.com/user-attachments/assets/5846618d-6a62-4d66-ab80-1f72cd96b1fb" />
-
-)
+<p align="center"><img width="1465" height="786" alt="Screenshot 2026-04-26 at 11 15 24 PM" src="https://github.com/user-attachments/assets/5846618d-6a62-4d66-ab80-1f72cd96b1fb" /></p>
 
 > Dark-mode dashboard with a gradient-mesh background. The hero card frames the value prop. Four stat cards expose key health metrics. Recent failures stream in on the left; entities ranked by risk on the right. Hit *Investigate a failure* to drop into RCA, or *Simulate a change* to forecast blast radius.
 
@@ -54,8 +52,7 @@ Every answer ships with **placebo p-values, subset stability, and 95% confidence
 
 ### Graph — lineage as a causal DAG
 
-![Graph — Lineage DAG](<img width="1465" height="786" alt="Screenshot 2026-04-26 at 11 15 35 PM" src="https://github.com/user-attachments/assets/5ebdb861-80c1-4f2e-8eb9-be3ab9fee100" />
-)
+<p align="center"><img width="1465" height="786" alt="Screenshot 2026-04-26 at 11 15 35 PM" src="https://github.com/user-attachments/assets/5ebdb861-80c1-4f2e-8eb9-be3ab9fee100" /></p>
 
 > Force-directed DAG with risk-coloured nodes. The cyan-ringed `revenue_view` is the entity in focus. `campaign_attribution` glows red (risk 0.71), `Marketing-Attribution` glows amber (risk 0.62). Filter by entity type, scrub the time window, click any node for owner / risk score / action buttons.
 
@@ -63,9 +60,7 @@ Every answer ships with **placebo p-values, subset stability, and 95% confidence
 
 ### What-if — interventional blast radius
 
-![What-if — Intervention Simulator](<img width="1465" height="786" alt="Screenshot 2026-04-26 at 11 15 49 PM" src="https://github.com/user-attachments/assets/09535127-d469-4430-9df0-b02f11008cb7" />
-
-)
+<p align="center"><img width="1465" height="786" alt="Screenshot 2026-04-26 at 11 15 49 PM" src="https://github.com/user-attachments/assets/09535127-d469-4430-9df0-b02f11008cb7" /></p>
 
 > Pre-fill target entity, action (`drop_column`), and column. Slide Monte-Carlo samples up to 5000. The simulator runs forward propagation through the causal subgraph and returns per-asset breakage probabilities. The path column shows *why* — `discount_code referenced in join`, etc.
 
