@@ -1,11 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm --filter @causalops/om-client build && pnpm --filter @causalops/ingestor build && pnpm --filter @causalops/api build && pnpm --filter @causalops/web build",
-  "installCommand": "pnpm install --frozen-lockfile=false",
-  "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ./apps/web ./apps/api ./packages",
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@next_public_api_url"
-  }
+  "buildCommand": "pnpm --filter @causalops/om-client build && pnpm --filter @causalops/ingestor build && pnpm --filter @causalops/api build && pnpm --filter @causalops/web build",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "outputDirectory": "apps/web/.next",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ./apps/web ./apps/api ./packages"
 }
