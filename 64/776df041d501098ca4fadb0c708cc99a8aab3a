@@ -1,0 +1,33 @@
+apps/api/tsconfig.json
+  0d48c038ea8e26d3 7-8
+packages/ingestor/tsconfig.json
+  0d48c038ea8e26d3 7-8
+.claude/settings.json
+  0d48c038ea8e26d3 12-56
+.gitignore
+  0d48c038ea8e26d3 12
+packages/om-client/tsconfig.json
+  0d48c038ea8e26d3 7-8
+vercel.json
+  0d48c038ea8e26d3 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "64776df041d501098ca4fadb0c708cc99a8aab3a",
+  "prompts": {
+    "0d48c038ea8e26d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84d13c6e-19d6-4f81-bc92-9231b8f16da4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sushant",
+      "messages": [],
+      "total_additions": 25,
+      "total_deletions": 20,
+      "accepted_lines": 70,
+      "overriden_lines": 2
+    }
+  }
+}
