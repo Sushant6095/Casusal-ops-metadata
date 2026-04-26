@@ -76,7 +76,7 @@ Every answer ships with **placebo p-values, subset stability, and 95% confidence
 
 Watch the 3-minute walkthrough: **[YouTube](#)** *(replace with your link)*
 
-For a step-by-step breakdown of every click, see [`docs/END-TO-END-DEMO.md`](docs/END-TO-END-DEMO.md).
+A click-by-click walkthrough is in the video.
 
 ---
 
@@ -92,7 +92,7 @@ For a step-by-step breakdown of every click, see [`docs/END-TO-END-DEMO.md`](doc
 | False-positive rate *(confounded picked)* | 30% | 100% |
 | **Overall correctness** | **75%** | 50% |
 
-Full per-incident breakdown: [`docs/backtest-report.md`](docs/backtest-report.md).
+Reproduce the back-test:
 
 ```bash
 pnpm incidents:inject --seed 42
@@ -128,8 +128,6 @@ OpenMetadata ──▶ Ingestor ──▶ TimescaleDB ──▶ Causal worker (P
 | **API** | `apps/api` | Fastify 5 + tRPC 11 + Zod |
 | **Web** | `apps/web` | Next.js 15 + React 19 + D3 + Tailwind |
 | **MCP** | `apps/mcp` | @modelcontextprotocol/sdk · stdio + SSE |
-
-Deeper write-up with sequence diagrams: [`docs/architecture.md`](docs/architecture.md).
 
 ---
 
@@ -180,7 +178,7 @@ Open <http://localhost:3000>.
 
 > 🩺 **Health check:** `curl localhost:3001/health localhost:8000/health localhost:3000` — should all return 200.
 
-For a no-OM-token mode (demo data only) see [`docs/END-TO-END-DEMO.md`](docs/END-TO-END-DEMO.md).
+No-OM-token demo: skip step 4's `seed:om` and use `pnpm demo:seed` — populates TimescaleDB directly.
 
 ---
 
@@ -222,7 +220,6 @@ See [`apps/mcp/mcp.config.json`](apps/mcp/mcp.config.json) — paste into OM Set
 3. **Backdoor + propensity score matching.** We pick the minimal adjustment set (parents of the treatment, minus descendants), then match propensity scores between treated and untreated time-buckets. EconML's Double-ML kicks in when the adjustment set grows past 20 covariates.
 4. **Refutation is non-negotiable.** Placebo permutation p-value + subset stability ship on every estimate. *Confidence in the UI* is a weighted function of both, not a tone-of-voice decision.
 
-📖 [`docs/theory.md`](docs/theory.md) — 2-page primer for engineers, not statisticians.
 
 ---
 
@@ -279,11 +276,7 @@ CausalOps-hackathon/
 │   ├── demo-seed-timescale.ts # No-OM-token demo seed
 │   └── backtest.ts          # Validation harness
 ├── docs/
-│   ├── architecture.md      # System diagrams (mermaid)
-│   ├── theory.md            # Causal inference primer
-│   ├── backtest-report.md   # Per-incident validation
-│   ├── END-TO-END-DEMO.md   # Click-by-click demo guide
-│   ├── video-demo-final.md  # 3-min teleprompter script
+│   ├── architecture.svg     # System diagram
 │   └── screenshots/         # Product screenshots
 ├── docker-compose.yml
 └── README.md
