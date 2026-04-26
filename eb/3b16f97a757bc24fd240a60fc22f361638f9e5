@@ -1,0 +1,25 @@
+scripts/demo-seed-timescale.ts
+  0d48c038ea8e26d3 123-127,129-148,151,153,167-176
+docs/END-TO-END-DEMO.md
+  0d48c038ea8e26d3 1-412
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "eb3b16f97a757bc24fd240a60fc22f361638f9e5",
+  "prompts": {
+    "0d48c038ea8e26d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84d13c6e-19d6-4f81-bc92-9231b8f16da4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sushant",
+      "messages": [],
+      "total_additions": 453,
+      "total_deletions": 21,
+      "accepted_lines": 499,
+      "overriden_lines": 0
+    }
+  }
+}
